@@ -7,7 +7,10 @@ x = PrettyTable()
 x.field_names = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Child", "Spouse"]
 #x.add_row([0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-print(x) 
+y = PrettyTable()
+y.field_names = ["ID", "Married", "Divorced", "Husband ID", "Husband Name", "Wife ID", "Wife Name", "Children"]
+
+spouseArray = []
 
 f = open('gedexample.txt', 'r')
 
@@ -56,19 +59,22 @@ for l in lines:
       #print("<-- " + elem[0] + "|" + elem[2] + "|" + valid + "|" + elem[1])
       #rest = ""
 
-print("Indi....", individuals)
-print("Fams.... ", families)
+#print("Indi....", individuals)
+#print("Fams.... ", families)
 
-#printing the individual table
+#getting info needed for individuals
+
+#print(lines)
+
+
 indInfo = []
-print(lines)
 for i in range(len(individuals)):
   #print(individuals[i][1])
 
   rejoinedLine = " ".join(individuals[i])
 
   indexIndAt = lines.index(rejoinedLine)
-  print(indexIndAt)
+  #print(indexIndAt)
   indexIndAtTag = lines[indexIndAt][0]
   #print(indexIndAtTag)
 
@@ -83,8 +89,35 @@ for i in range(len(individuals)):
     indexIndAt += 1
   
   indInfo.append(tempInd)
-  print("---------")
-  print(indInfo)
+  #print("---------")
+  #print(indInfo)
+
+#getting info needed for fam
+famInfo = []
+for i in range(len(families)):
+  #print(individuals[i][1])
+  if 'FAM' in families[i]:
+    #print("fam found")
+    rejoinedLine = " ".join(families[i])
+
+    indexFamAt = lines.index(rejoinedLine)
+    #print(indexFamAt)
+    indexFamAtTag = lines[indexFamAt][0]
+    #print(indexIndAtTag)
+
+    tempFam = []
+
+    tempFam.append(lines[indexFamAt])
+    indexFamAt += 1
+
+    while(lines[indexFamAt][0] != "0"):
+      #print("getting fam tab")
+      tempFam.append(lines[indexFamAt])
+      indexFamAt += 1
+    
+    famInfo.append(tempFam)
+    #print("---------")
+    #print(famInfo)
 
 f.close()
 
@@ -96,6 +129,9 @@ for i in range(len(indInfo)):
 
   if "FAMS" in indInfo[i][5]:
     spouse = True
+    spouseArray.append(indInfo[i][0][2:6])
+    spouseArray.append(indInfo[i][1][7:])
+
     spouseFam = "{'" + indInfo[i][5][7:] + "'}"
   elif "FAMC" in indInfo[i][5]:
     child = True
@@ -103,5 +139,42 @@ for i in range(len(indInfo)):
 
   x.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], 0, 0, 0, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
 
+
+for i in range(len(famInfo)):
+  husbID = "N/A"
+  wifeID = "N/A"
+  marriage = "N/A"
+  divorce = "N/A"
+  husbName = ""
+  wifeName = ""
+  children = "{"
+  for j in range(len(famInfo[i])):
+    if "CHIL" in famInfo[i][j]:
+      children += "'"
+      children += famInfo[i][j][7:]
+      children += "'"
+
+    if "HUSB" in famInfo[i][j]:
+      husbID = famInfo[i][j][7:]
+      husbName = spouseArray[spouseArray.index(husbID) + 1]
+
+    if "WIFE" in famInfo[i][j]:
+      wifeID = famInfo[i][j][7:]
+      wifeName = spouseArray[spouseArray.index(wifeID) + 1]
+
+    if "MARR" in famInfo[i][j]:
+      #implement marriage date
+      print(" ")
+    if "DIV" in famInfo[i][j]:
+      #implement divorce date
+      print(" ")
+    
+  children += "}"
+
+  y.add_row([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
+
 x.sortby = "ID"
 print(x)
+y.sortby = "ID"
+print(y)
+#print(spouseArray)
