@@ -34,7 +34,7 @@ for l in lines:
   if l != "":
     #print("--> " + l)
     elem = l.rsplit()
-    print('element..',elem)
+    #print('element..',elem)
     regular = True
     if ("INDI" in elem):
       individuals += [elem]
