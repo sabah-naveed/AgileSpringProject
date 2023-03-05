@@ -1,7 +1,7 @@
-# Sabah Naveed
-# I pledge my honor that I have abided by the Stevens Honor System.
-# Project 2
 from prettytable import PrettyTable
+import datetime
+
+current_year = datetime.datetime.now().year
 
 x = PrettyTable()
 x.field_names = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Child", "Spouse"]
@@ -32,9 +32,9 @@ lines = contents.splitlines()
 rest = ""
 for l in lines:
   if l != "":
-    print("--> " + l)
+    #print("--> " + l)
     elem = l.rsplit()
-    #print(elem)
+    print('element..',elem)
     regular = True
     if ("INDI" in elem):
       individuals += [elem]
@@ -68,6 +68,7 @@ for l in lines:
 
 
 indInfo = []
+dateOfBirth = []
 for i in range(len(individuals)):
   #print(individuals[i][1])
 
@@ -89,8 +90,10 @@ for i in range(len(individuals)):
     indexIndAt += 1
   
   indInfo.append(tempInd)
-  #print("---------")
-  #print(indInfo)
+  print("---------")
+  print('Indi info full...',indInfo[0])
+
+  print('Indi info onlly age...',indInfo[0][4])
 
 #getting info needed for fam
 famInfo = []
@@ -123,9 +126,12 @@ f.close()
 
 #do individual table
 
+
+
 for i in range(len(indInfo)):
   child = False
   spouse = False
+  age = 0
 
   if "FAMS" in indInfo[i][5]:
     spouse = True
@@ -136,8 +142,12 @@ for i in range(len(indInfo)):
   elif "FAMC" in indInfo[i][5]:
     child = True
     childFam = "{'" + indInfo[i][5][7:] + "'}"
+  
+  dateOfBirth = (indInfo[i][4][14:])
+  age = current_year - int(dateOfBirth)
+  #print('age is ..',age)
 
-  x.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], 0, 0, 0, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
+  x.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, 0, 0, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
 
 
 for i in range(len(famInfo)):
