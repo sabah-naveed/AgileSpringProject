@@ -90,10 +90,10 @@ for i in range(len(individuals)):
     indexIndAt += 1
   
   indInfo.append(tempInd)
-  print("---------")
-  print('Indi info full...',indInfo[0])
+ # print("---------")
+ # print('Indi info full...',indInfo[0])
 
-  print('Indi info onlly age...',indInfo[0][4])
+  #print('Indi info onlly age...',indInfo[0][4])
 
 #getting info needed for fam
 famInfo = []
