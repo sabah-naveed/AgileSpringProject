@@ -194,11 +194,12 @@ for i in range(len(famInfo)):
       wifeName = spouseArray[spouseArray.index(wifeID) + 1]
 
     if "MARR" in famInfo[i][j]:
-      #implement marriage date
-      print(" ")
+     # print("indie marr value...", famInfo[i][5][6:])
+      marriage = famInfo[i][5][6:]
     if "DIV" in famInfo[i][j]:
-      #implement divorce date
-      print(" ")
+      # print("indie div value...", famInfo[i][7][6:])
+      divorce = famInfo[i][7][6:]
+      #  print(" ")
     
   children += "}"
 
