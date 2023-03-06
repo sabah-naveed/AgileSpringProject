@@ -35,11 +35,14 @@ for l in lines:
     #print("--> " + l)
     elem = l.rsplit()
     #print('element..',elem)
+    #print("-----")
     regular = True
     if ("INDI" in elem):
       individuals += [elem]
     if ("FAM" in elem) or ("FAMC" in elem) or ("FAMS" in elem):
       families += [elem]
+      #print("families...", families)
+      #print("-----")
     if elem:
       if elem[1] in validTags:
         valid = "T"
@@ -120,34 +123,50 @@ for i in range(len(families)):
     
     famInfo.append(tempFam)
     #print("---------")
-    #print(famInfo)
-
+   
 f.close()
 
-#do individual table
-
-
-
+#do individual table --> print('individual table..', indInfo)
 for i in range(len(indInfo)):
   child = False
   spouse = False
   age = 0
+  alive = True
+  deathDate = "N/A"
+   #print('indInfo of i..', indInfo[i])
+  for item in indInfo[i]:
+    if "FAMS" in item:
+      indexOfFamS = indInfo[i].index(next(item for item in indInfo[i] if "FAMS" in item))
+      #  print('index is...',indexOfFamS)
+      spouse = True
+      spouseArray.append(indInfo[i][indexOfFamS][7:])
+      spouseArray.append(indInfo[i][0][2:6])
+       #print('spouse of i..', spouseArray)
+      spouseArray.append(indInfo[i][1][7:])
+      spouseFam = "{'" + indInfo[i][indexOfFamS][7:] + "'}"
+      #print("spouse array after append.. famS...", spouseArray)
+      #print("---------------")
+    elif "FAMC" in item:
+       #print('inside FAMC..')
+      indexOfFamC = indInfo[i].index(next(item for item in indInfo[i] if "FAMC" in item))
+      child = True
+      childFam = "{'" + indInfo[i][indexOfFamC][7:] + "'}"
+    elif "DEAT" in item:
+      #print("inside death...")
+      alive = False
+      deathDate = indInfo[i][6][6:]
 
-  if "FAMS" in indInfo[i][5]:
-    spouse = True
-    spouseArray.append(indInfo[i][0][2:6])
-    spouseArray.append(indInfo[i][1][7:])
+  if indInfo[i][4][8] == " " :
+    dateOfBirth = indInfo[i][4][13:]
+  else:
+    dateOfBirth = indInfo[i][4][14:]
 
-    spouseFam = "{'" + indInfo[i][5][7:] + "'}"
-  elif "FAMC" in indInfo[i][5]:
-    child = True
-    childFam = "{'" + indInfo[i][5][7:] + "'}"
-  
-  dateOfBirth = (indInfo[i][4][14:])
+  #print('dateOfBirth ..',dateOfBirth)
   age = current_year - int(dateOfBirth)
-  #print('age is ..',age)
+  #print('alive ..',alive)
 
-  x.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, 0, 0, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
+
+  x.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
 
 
 for i in range(len(famInfo)):
@@ -166,10 +185,12 @@ for i in range(len(famInfo)):
 
     if "HUSB" in famInfo[i][j]:
       husbID = famInfo[i][j][7:]
+     # print('huband id...',husbID)
       husbName = spouseArray[spouseArray.index(husbID) + 1]
 
     if "WIFE" in famInfo[i][j]:
       wifeID = famInfo[i][j][7:]
+      #print('wifeID id...',wifeID)
       wifeName = spouseArray[spouseArray.index(wifeID) + 1]
 
     if "MARR" in famInfo[i][j]:
