@@ -1,5 +1,7 @@
 from prettytable import PrettyTable
 import datetime
+from datetime import date
+import unittest
 
 current_year = datetime.datetime.now().year
 
@@ -194,19 +196,66 @@ for i in range(len(famInfo)):
       wifeName = spouseArray[spouseArray.index(wifeID) + 1]
 
     if "MARR" in famInfo[i][j]:
-     # print("indie marr value...", famInfo[i][5][6:])
-      marriage = famInfo[i][5][6:]
+      indexOfMarrDate = famInfo[i].index(next(item for item in famInfo[i] if "MARR" in item))
+      marriage = famInfo[i][indexOfMarrDate+1][6:]
+   
     if "DIV" in famInfo[i][j]:
-      # print("indie div value...", famInfo[i][7][6:])
-      divorce = famInfo[i][7][6:]
+      indexOfDivDate = famInfo[i].index(next(item for item in famInfo[i] if "DIV" in item))
+      #print("index of marr is,...", famInfo[i][indexOfDivDate+1][6:])
+      divorce = famInfo[i][indexOfDivDate+1][6:]
       #  print(" ")
     
   children += "}"
 
   y.add_row([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
 
+
+dobOfChild = 0
+marrInfoDate = 0
+famChilArray = []
+for i in range(len(indInfo)):
+  for item in indInfo[i]:
+    if "FAMC" in item:
+      #  print("FAMC is there......",indInfo[i])
+       # indexOfFamcDOB = indInfo[i].index(next(item for item in indInfo[i] if "FAMC" in item))
+      #  print("index of date is,...", indexOfFamcDOB)
+      famChilArray.append(indInfo[i])
+       # dobOfChild = indInfo[i][indexOfFamcDOB][6:]
+      break
+
+# print("famChilArray is..",famChilArray)
+# for i in range(len(famChilArray)):
+  # for item in famChilArray[i]:
+  
+for i in range(len(famInfo)):
+  for item in famInfo[i]:
+    if "MARR" in item:
+      #  print("FAMC is there......",famInfo[i])
+      indexOfMarrDOB = famInfo[i].index(next(item for item in famInfo[i] if "MARR" in item))
+       # print("---------------")
+      #  print("date is..",famInfo[i][indexOfMarrDOB+1][6:])
+      marrInfoDate = famInfo[i][indexOfMarrDOB+1][6:]
+      break
+      
+#splitDobOfChild = dobOfChild.rsplit()
+#splitMarrInfoDate = marrInfoDate.rsplit()
+
+#print("dob of chid...",int(splitDobOfChild[2]) )
+#print("dob of marriage...", int(splitMarrInfoDate[2]))
+validChildDob = 0
+isValidChildDob = False
+#diff = int(splitMarrInfoDate[2])-(int(splitDobOfChild[2]))
+#if diff > 0:
+  #print("ANOMALY: US08:",)
+#print("diff is..", diff)
+
+
+
 x.sortby = "ID"
 print(x)
 y.sortby = "ID"
 print(y)
 #print(spouseArray)
+
+# have to find every child's DOB and then compare it with the MARR Date -- TODO
+
