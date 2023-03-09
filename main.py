@@ -24,6 +24,9 @@ validTags = [
 individuals = []
 families = []
 
+lessThan150 = []
+dead = []
+
 #file contents
 contents = f.read()
 
@@ -157,6 +160,8 @@ for i in range(len(indInfo)):
       #print("inside death...")
       alive = False
       deathDate = indInfo[i][6][6:]
+      #add to dead array
+      dead += [indInfo[i][0][2:6]]
 
   if indInfo[i][4][8] == " " :
     dateOfBirth = indInfo[i][4][13:]
@@ -166,9 +171,11 @@ for i in range(len(indInfo)):
   #print('dateOfBirth ..',dateOfBirth)
   age = current_year - int(dateOfBirth)
   #print('alive ..',alive)
-
+  if age < 150:
+    lessThan150 += [indInfo[i][0][2:6]]
 
   x.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
+
 
 
 for i in range(len(famInfo)):
@@ -255,7 +262,20 @@ x.sortby = "ID"
 print(x)
 y.sortby = "ID"
 print(y)
+
 #print(spouseArray)
 
 # have to find every child's DOB and then compare it with the MARR Date -- TODO
 
+
+#LISTING LESS THAN 150 YEARS OLD
+print("Individuals that are less than 150 years old")
+print(lessThan150)
+
+#LISTING DECEASED INDIVIDUALS
+print("Individuals that have passed away")
+print(dead)
+
+  
+#LISTING DECEASED INDIVIDUALS
+#print(spouseArray)
