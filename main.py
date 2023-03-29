@@ -1,281 +1,427 @@
-from prettytable import PrettyTable
-import datetime
-from datetime import date
-import unittest
+#############################################################################
+#  Agile GEDCOM Project                                                     #
+#  Sabah Naveed, Parul Mahajan, Manoj Sai Naramreddy, & Dhruvan Dronavalli  #                                                          
+#  I pledge my honor that I have abided by the Stevens Honor System.        #
+#############################################################################           
 
+#imports
+import datetime
+from prettytable import PrettyTable
+
+#global variables commonly used among stories
 current_year = datetime.datetime.now().year
 
-x = PrettyTable()
-x.field_names = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Child", "Spouse"]
-#x.add_row([0, 0, 0, 0, 0, 0, 0, 0, 0])
+individualTable = PrettyTable()
+individualTable.field_names = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Child", "Spouse"]
 
-y = PrettyTable()
-y.field_names = ["ID", "Married", "Divorced", "Husband ID", "Husband Name", "Wife ID", "Wife Name", "Children"]
-
-spouseArray = []
-
-f = open('gedexample.txt', 'r')
-
-validTags = [
-  "INDI", "NAME", "SEX", "BIRT", "DEAT", "FAMC", "FAMS", "FAM", "MARR", "HUSB",
-  "WIFE", "CHIL", "DIV", "DATE", "HEAD", "TRLR", "NOTE"
-]
+familyTable = PrettyTable()
+familyTable.field_names = ["ID", "Married", "Divorced", "Husband ID", "Husband Name", "Wife ID", "Wife Name", "Children"]
 
 individuals = []
 families = []
 
-lessThan150 = []
-dead = []
-
-#file contents
-contents = f.read()
-
-#each line is an element in list
-lines = contents.splitlines()
-
-#loop that formats and splits every line according to specs
-rest = ""
-for l in lines:
-  if l != "":
-    #print("--> " + l)
-    elem = l.rsplit()
-    #print('element..',elem)
-    #print("-----")
-    regular = True
-    if ("INDI" in elem):
-      individuals += [elem]
-    if ("FAM" in elem) or ("FAMC" in elem) or ("FAMS" in elem):
-      families += [elem]
-      #print("families...", families)
-      #print("-----")
-    if elem:
-      if elem[1] in validTags:
-        valid = "T"
-      else:
-        if len(elem) > 2 and elem[2] in validTags:
-          valid = "T"
-          regular = False
-        else:
-          valid = "F"
-      for i in elem[2:]:
-        rest += i
-        rest += " "
-
-      #if regular:
-      #print("<-- " + elem[0] + "|" + elem[1] + "|" + valid + "|" + rest)
-      #else:
-      #print("<-- " + elem[0] + "|" + elem[2] + "|" + valid + "|" + elem[1])
-      #rest = ""
-
-#print("Indi....", individuals)
-#print("Fams.... ", families)
-
-#getting info needed for individuals
-
-#print(lines)
-
-
 indInfo = []
-dateOfBirth = []
-for i in range(len(individuals)):
-  #print(individuals[i][1])
+spouseArray = []
 
-  rejoinedLine = " ".join(individuals[i])
 
-  indexIndAt = lines.index(rejoinedLine)
-  #print(indexIndAt)
-  indexIndAtTag = lines[indexIndAt][0]
-  #print(indexIndAtTag)
+#parse file
+def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan150, dead):
+    #parse the file and do initial population
+    #Input: filename
 
-  tempInd = []
+    validTags = ["INDI", "NAME", "SEX", "BIRT", "DEAT", "FAMC", "FAMS", "FAM", "MARR", "HUSB", "WIFE", "CHIL", "DIV", "DATE", "HEAD", "TRLR", "NOTE"]
+    f = open(filename, "r")
+    contents = f.read()
+    lines = contents.splitlines()
 
-  tempInd.append(lines[indexIndAt])
-  indexIndAt += 1
+    rest = ""
+    for l in lines:
+        if l != "":
+          elem = l.rsplit()
+          regular = True
+          if ("INDI" in elem):
+              individuals += [elem]
+          if ("FAM" in elem) or ("FAMC" in elem) or ("FAMS" in elem):
+              families += [elem]
+          if elem:
+              if elem[1] in validTags:
+                  valid = "T"
+          else:
+              if len(elem) > 2 and elem[2] in validTags:
+                  valid = "T"
+                  regular = False
+              else:
+                  valid = "F"
+          for i in elem[2:]:
+              rest += i
+              rest += " "
+          if ("DATE" in elem):
+            invalid_date(elem[2:])
 
-  
-  while(lines[indexIndAt][0] != "0"):
-    tempInd.append(lines[indexIndAt])
-    indexIndAt += 1
-  
-  indInfo.append(tempInd)
- # print("---------")
- # print('Indi info full...',indInfo[0])
 
-  #print('Indi info onlly age...',indInfo[0][4])
+    indInfo = []
+    dateOfBirth = []
+    for i in range(len(individuals)):
 
-#getting info needed for fam
-famInfo = []
-for i in range(len(families)):
-  #print(individuals[i][1])
-  if 'FAM' in families[i]:
-    #print("fam found")
-    rejoinedLine = " ".join(families[i])
+        rejoinedLine = " ".join(individuals[i])
 
-    indexFamAt = lines.index(rejoinedLine)
-    #print(indexFamAt)
-    indexFamAtTag = lines[indexFamAt][0]
-    #print(indexIndAtTag)
+        indexIndAt = lines.index(rejoinedLine)
+        indexIndAtTag = lines[indexIndAt][0]
 
-    tempFam = []
+        tempInd = []
 
-    tempFam.append(lines[indexFamAt])
-    indexFamAt += 1
+        tempInd.append(lines[indexIndAt])
+        indexIndAt += 1
 
-    while(lines[indexFamAt][0] != "0"):
-      #print("getting fam tab")
-      tempFam.append(lines[indexFamAt])
-      indexFamAt += 1
+        
+        while(lines[indexIndAt][0] != "0"):
+            tempInd.append(lines[indexIndAt])
+            indexIndAt += 1
     
-    famInfo.append(tempFam)
-    #print("---------")
-   
-f.close()
+        indInfo.append(tempInd)
 
-#do individual table --> print('individual table..', indInfo)
-for i in range(len(indInfo)):
-  child = False
-  spouse = False
-  age = 0
-  alive = True
-  deathDate = "N/A"
-   #print('indInfo of i..', indInfo[i])
-  for item in indInfo[i]:
-    if "FAMS" in item:
-      indexOfFamS = indInfo[i].index(next(item for item in indInfo[i] if "FAMS" in item))
-      #  print('index is...',indexOfFamS)
-      spouse = True
-      spouseArray.append(indInfo[i][indexOfFamS][7:])
-      spouseArray.append(indInfo[i][0][2:6])
-       #print('spouse of i..', spouseArray)
-      spouseArray.append(indInfo[i][1][7:])
-      spouseFam = "{'" + indInfo[i][indexOfFamS][7:] + "'}"
-      #print("spouse array after append.. famS...", spouseArray)
-      #print("---------------")
-    elif "FAMC" in item:
-       #print('inside FAMC..')
-      indexOfFamC = indInfo[i].index(next(item for item in indInfo[i] if "FAMC" in item))
-      child = True
-      childFam = "{'" + indInfo[i][indexOfFamC][7:] + "'}"
-    elif "DEAT" in item:
-      #print("inside death...")
-      alive = False
-      deathDate = indInfo[i][6][6:]
-      #add to dead array
-      dead += [indInfo[i][0][2:6]]
+    #getting info needed for fam
+    famInfo = []
+    for i in range(len(families)):
+    #print(individuals[i][1])
+        if 'FAM' in families[i]:
+            rejoinedLine = " ".join(families[i])
 
-  if indInfo[i][4][8] == " " :
-    dateOfBirth = indInfo[i][4][13:]
-  else:
-    dateOfBirth = indInfo[i][4][14:]
+            indexFamAt = lines.index(rejoinedLine)
+            indexFamAtTag = lines[indexFamAt][0]
 
-  #print('dateOfBirth ..',dateOfBirth)
-  age = current_year - int(dateOfBirth)
-  #print('alive ..',alive)
-  if age < 150:
-    lessThan150 += [indInfo[i][0][2:6]]
+            tempFam = []
 
-  x.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
+            tempFam.append(lines[indexFamAt])
+            indexFamAt += 1
 
-
-
-for i in range(len(famInfo)):
-  husbID = "N/A"
-  wifeID = "N/A"
-  marriage = "N/A"
-  divorce = "N/A"
-  husbName = ""
-  wifeName = ""
-  children = "{"
-  for j in range(len(famInfo[i])):
-    if "CHIL" in famInfo[i][j]:
-      children += "'"
-      children += famInfo[i][j][7:]
-      children += "'"
-
-    if "HUSB" in famInfo[i][j]:
-      husbID = famInfo[i][j][7:]
-     # print('huband id...',husbID)
-      husbName = spouseArray[spouseArray.index(husbID) + 1]
-
-    if "WIFE" in famInfo[i][j]:
-      wifeID = famInfo[i][j][7:]
-      #print('wifeID id...',wifeID)
-      wifeName = spouseArray[spouseArray.index(wifeID) + 1]
-
-    if "MARR" in famInfo[i][j]:
-      indexOfMarrDate = famInfo[i].index(next(item for item in famInfo[i] if "MARR" in item))
-      marriage = famInfo[i][indexOfMarrDate+1][6:]
-   
-    if "DIV" in famInfo[i][j]:
-      indexOfDivDate = famInfo[i].index(next(item for item in famInfo[i] if "DIV" in item))
-      #print("index of marr is,...", famInfo[i][indexOfDivDate+1][6:])
-      divorce = famInfo[i][indexOfDivDate+1][6:]
-      #  print(" ")
+            while(lines[indexFamAt][0] != "0"):
+            #print("getting fam tab")
+                tempFam.append(lines[indexFamAt])
+                indexFamAt += 1
+            
+            famInfo.append(tempFam)
     
-  children += "}"
+    f.close()
 
-  y.add_row([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
+    #do individual table --> print('individual table..', indInfo)
+    for i in range(len(indInfo)):
+        child = False
+        spouse = False
+        age = 0
+        alive = True
+        deathDate = "N/A"
+        #print('indInfo of i..', indInfo[i])
+        for item in indInfo[i]:
+            if "FAMS" in item:
+                indexOfFamS = indInfo[i].index(next(item for item in indInfo[i] if "FAMS" in item))
+                #  print('index is...',indexOfFamS)
+                spouse = True
+                spouseArray.append(indInfo[i][indexOfFamS][7:])
+                spouseArray.append(indInfo[i][0][2:6])
+                #print('spouse of i..', spouseArray)
+                spouseArray.append(indInfo[i][1][7:])
+                spouseFam = "{'" + indInfo[i][indexOfFamS][7:] + "'}"
+            #print("spouse array after append.. famS...", spouseArray)
+            #print("---------------")
+            elif "FAMC" in item:
+            #print('inside FAMC..')
+                indexOfFamC = indInfo[i].index(next(item for item in indInfo[i] if "FAMC" in item))
+                child = True
+                childFam = "{'" + indInfo[i][indexOfFamC][7:] + "'}"
+            elif "DEAT" in item:
+            #print("inside death...")
+                list_deceased(i)
+                
 
+        if indInfo[i][4][8] == " " :
+            dateOfBirth = indInfo[i][4][13:]
+        else:
+            dateOfBirth = indInfo[i][4][14:]
 
-dobOfChild = 0
-marrInfoDate = 0
-famChilArray = []
-for i in range(len(indInfo)):
-  for item in indInfo[i]:
-    if "FAMC" in item:
-      #  print("FAMC is there......",indInfo[i])
-       # indexOfFamcDOB = indInfo[i].index(next(item for item in indInfo[i] if "FAMC" in item))
-      #  print("index of date is,...", indexOfFamcDOB)
-      famChilArray.append(indInfo[i])
-       # dobOfChild = indInfo[i][indexOfFamcDOB][6:]
-      break
+    #print('dateOfBirth ..',dateOfBirth)
+        age = include_individual_ages(dateOfBirth)
+        #print('alive ..',alive)
+        if less_than_150_years_old(age):
+            lessThan150 += [indInfo[i][0][2:6]]
 
-# print("famChilArray is..",famChilArray)
-# for i in range(len(famChilArray)):
-  # for item in famChilArray[i]:
-  
-for i in range(len(famInfo)):
-  for item in famInfo[i]:
-    if "MARR" in item:
-      #  print("FAMC is there......",famInfo[i])
-      indexOfMarrDOB = famInfo[i].index(next(item for item in famInfo[i] if "MARR" in item))
-       # print("---------------")
-      #  print("date is..",famInfo[i][indexOfMarrDOB+1][6:])
-      marrInfoDate = famInfo[i][indexOfMarrDOB+1][6:]
-      break
-      
-#splitDobOfChild = dobOfChild.rsplit()
-#splitMarrInfoDate = marrInfoDate.rsplit()
-
-#print("dob of chid...",int(splitDobOfChild[2]) )
-#print("dob of marriage...", int(splitMarrInfoDate[2]))
-validChildDob = 0
-isValidChildDob = False
-#diff = int(splitMarrInfoDate[2])-(int(splitDobOfChild[2]))
-#if diff > 0:
-  #print("ANOMALY: US08:",)
-#print("diff is..", diff)
-
-
-
-x.sortby = "ID"
-print(x)
-y.sortby = "ID"
-print(y)
-
-#print(spouseArray)
-
-# have to find every child's DOB and then compare it with the MARR Date -- TODO
+        individualTable.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
+        individuals.append([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
 
 
-#LISTING LESS THAN 150 YEARS OLD
-print("Individuals that are less than 150 years old")
-print(lessThan150)
 
-#LISTING DECEASED INDIVIDUALS
-print("Individuals that have passed away")
-print(dead)
+    for i in range(len(famInfo)):
+        husbID = "N/A"
+        wifeID = "N/A"
+        marriage = "N/A"
+        divorce = "N/A"
+        husbName = ""
+        wifeName = ""
+        children = "{"
+        for j in range(len(famInfo[i])):
+            if "CHIL" in famInfo[i][j]:
+                children += "'"
+                children += famInfo[i][j][7:]
+                children += "'"
 
-  
-#LISTING DECEASED INDIVIDUALS
-#print(spouseArray)
+            if "HUSB" in famInfo[i][j]:
+                husbID = famInfo[i][j][7:]
+                # print('huband id...',husbID)
+                husbName = spouseArray[spouseArray.index(husbID) + 1]
+
+            if "WIFE" in famInfo[i][j]:
+                wifeID = famInfo[i][j][7:]
+                #print('wifeID id...',wifeID)
+                wifeName = spouseArray[spouseArray.index(wifeID) + 1]
+
+            if "MARR" in famInfo[i][j]:
+            # print("indie marr value...", famInfo[i][5][6:])
+                marriage = famInfo[i][5][6:]
+            if "DIV" in famInfo[i][j]:
+            # print("indie div value...", famInfo[i][7][6:])
+                divorce = famInfo[i][7][6:]
+        #  print(" ")
+        
+    children += "}"
+
+    familyTable.add_row([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
+    families.append([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
+
+    list_large_age_differences(husbID, wifeID)
+
+    individualTable.sortby = "ID"
+    print(individualTable)
+    familyTable.sortby = "ID"
+    print(familyTable)
+
+    #LISTING LESS THAN 150 YEARS OLD
+    print("Individuals that are less than 150 years old")
+    print(lessThan150)
+
+    #LISTING DECEASED INDIVIDUALS
+    print("Individuals that have passed away")
+    print(dead)
+
+    #large age difference
+    
+
+
+        
+
+        
+
+
+#US01
+def dates_before_current_date():
+    #Dates (birth, marriage, divorce, death) should not be after the current date
+    print("[NOT IMPLEMENTED] US01: Dates before current date")
+
+#US02
+def birth_before_marriage():
+    #Birth should occur before marriage of an individual
+    print("[NOT IMPLEMENTED] US02: Birth before marriage")
+
+#US03
+def birth_before_death():
+    #Birth should occur before death of an individual
+    print("[NOT IMPLEMENTED] US03: Birth before death")
+
+#US04
+def marriage_before_divorce():
+    #Marriage should occur before divorce of spouses, and divorce can only occur after marriage
+    print("[NOT IMPLEMENTED] US04: Marriage before divorce")
+
+#US05
+def marriage_before_death():
+    #Marriage should occur before death of either spouse
+    print("[NOT IMPLEMENTED] US05: Marriage before death")
+
+#US06
+def divorce_before_death():
+    #Divorce can only occur before death of both spouses
+    print("[NOT IMPLEMENTED] US06: Divorce before death")
+
+#US07
+def less_than_150_years_old(a):
+    #Death should be less than 150 years after birth for dead people, and current date should be less than 150 years after birth for all living people
+    #Input: age
+    #Output: True or False
+    
+    if a < 150:
+        return True
+    else:
+        return False
+
+
+#US08
+def birth_before_marriage_of_parents():
+    #Children should be born after marriage of parents (and not more than 9 months after their divorce)
+    print("[NOT IMPLEMENTED] US08: Birth before marriage of parents")
+
+#US09
+def birth_before_death_of_parents():
+    #Child should be born before death of mother and before 9 months after death of father
+    print("[NOT IMPLEMENTED] US09: Birth before death of parents")
+
+#US10
+def marriage_after_14():
+    #Marriage should be at least 14 years after birth of both spouses (parents must be at least 14 years old)
+    print("[NOT IMPLEMENTED] US10: Marriage after 14")
+
+#US11
+def no_bigamy():
+    #Marriage should not occur during marriage to another spouse; No more than one marriage at a time
+    print("[NOT IMPLEMENTED] US11: No bigamy")
+
+#US12
+def parents_not_too_old():
+    #Mother should be less than 60 years older than her children and father should be less than 80 years older than his children
+    print("[NOT IMPLEMENTED] US12: Parents not too old")
+
+#US13
+def siblings_spacing():
+    #Birth dates of siblings should be more than 8 months apart or less than 2 days apart (twins may be born one day apart, e.g. 11:59 PM and 12:02 AM the following calendar day)
+    print("[NOT IMPLEMENTED] US13: Siblings spacing")
+
+#US17
+def no_marriages_to_descendants():
+    #Parents should not marry any of their descendants
+    print("[NOT IMPLEMENTED] US17: No marriages to descendants")
+
+#US18
+def siblings_should_not_marry():
+    #Siblings should not marry one another
+    print("[NOT IMPLEMENTED] US18: Siblings should not marry")
+
+#US19
+def first_cousins_should_not_marry():
+    #First cousins should not marry one another
+    print("[NOT IMPLEMENTED] US19: First cousins should not marry")
+
+#US20
+def aunts_and_uncles():
+    #Aunts and uncles should not marry their nieces or nephews, their siblings’ children
+    print("[NOT IMPLEMENTED] US20: Aunts and uncles")
+
+#US22
+def unique_ids():
+    #All individual IDs should be unique and all family IDs should be unique
+    print("[NOT IMPLEMENTED] US22: Unique IDs")
+
+#US23
+def unique_name_and_birth_date():
+    #No more than one individual with the same name and birth date should appear in a GEDCOM file
+    print("[NOT IMPLEMENTED] US23: Unique name and birth date")
+
+#US24
+def unique_families_by_spouses():
+    #No more than one family with the same spouses by name and the same marriage date should appear in a GEDCOM file
+    print("[NOT IMPLEMENTED] US24: Unique families by spouses")
+
+#US27
+def include_individual_ages(dob):
+    #Include the current ages of all living individuals in the output
+    #Input: index of individual
+    #Output: age of individual
+    return current_year - int(dob)
+    
+    
+
+
+#US29
+def list_deceased(index):
+    #List all deceased individuals in a GEDCOM file
+    #Input: index of individual
+    #Output: dead array
+    
+    alive = False
+    deathDate = indInfo[index][6][6:]
+    #add to dead array
+    dead += [indInfo[index][0][2:6]]
+
+#US30
+def list_living_married():
+    #List all living married people in a GEDCOM file
+    print("[NOT IMPLEMENTED] US30: List living married")
+
+#US31
+def list_living_single():
+    #List all living people over 30 who have never been married in a GEDCOM file
+    print("[NOT IMPLEMENTED] US31: List living single")
+
+#US32
+def list_multiple_births():
+    #List all multiple births in a GEDCOM file
+    print("[NOT IMPLEMENTED] US32: List multiple births")
+
+#US33
+def list_orphans():
+    #List all orphaned children (both parents dead and child < 18 years old) in a GEDCOM file
+    print("[NOT IMPLEMENTED] US33: List orphans")
+
+#US34
+def list_large_age_differences(hID, wID):
+    #List all couples who were married when the older spouse was more than twice as old as the younger spouse
+    #Input: husband ID, wife ID
+    for i in individuals:
+        if i[0] == hID:
+            husbandAge = i[4]
+        if i[0] == wID:
+            wifeAge = i[4]
+
+    if husbandAge > wifeAge:
+        if husbandAge > 2*wifeAge:
+            print("Husband of ID", hID, "is more than twice as old as wife of ID", wID)
+        if wifeAge > 2*husbandAge:
+            print("Wife of", wID, "is more than twice as old as husband of ID", hID)
+
+
+#US35
+def list_recent_births():
+    #List all people in a GEDCOM file who were born in the last 30 days
+    print("[NOT IMPLEMENTED] US35: List recent births")
+
+#US36
+def list_recent_deaths():
+    #List all people in a GEDCOM file who died in the last 30 days
+    print("[NOT IMPLEMENTED] US36: List recent deaths")
+
+#US38
+def list_upcoming_birthdays():
+    #List all living people in a GEDCOM file whose birthdays occur in the next 30 days
+    print("[NOT IMPLEMENTED] US38: List upcoming birthdays")
+
+#US39
+def list_upcoming_anniversaries():
+    #List all living couples in a GEDCOM file whose marriage anniversaries occur in the next 30 days
+    print("[NOT IMPLEMENTED] US39: List upcoming anniversaries")
+
+#US42
+def invalid_date(d):
+    #Check for invalid dates
+    #input: date in ["day", "month", "year"] format
+    validMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+    if d[1] not in validMonths:
+        print("Error: Invalid date; wrong month")
+    if int(d[2]) > current_year:
+        print("Error: Invalid date; date in the future")
+    if int(d[2]) < 1:
+        print("Error: Invalid date; date in non-positive year")
+    if int(d[2]) % 4 != 0 and d[1] == "FEB" and int(d[0]) > 28:
+        print("Error: Invalid date; February has 28 days")
+    if d[1] == "FEB" and int(d[0]) > 29:
+        print("Error: Invalid date; February has 29 days at most")
+    if (d[1] == "APR" and int(d[0]) > 30) or (d[1] == "JUN" and int(d[0]) > 30) or (d[1] == "SEP" and int(d[0]) > 30) or (d[1] == "NOV" and int(d[0]) > 30):
+        print("Error: Invalid date; ", d[0], " has 30 days at most")
+    
+    
+
+
+def main():
+    #main
+
+    outArray = parse_file("gedexample.txt", individuals, families, indInfo, spouseArray, [], [])
+
+
+if __name__ == '__main__':
+    main()
