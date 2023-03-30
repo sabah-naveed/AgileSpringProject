@@ -111,7 +111,7 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
         age = 0
         alive = True
         deathDate = "N/A"
-        #print('indInfo of i..', indInfo[i])
+         #print('indInfo of i..', i, indInfo[i])
         for item in indInfo[i]:
             if "FAMS" in item:
                 indexOfFamS = indInfo[i].index(next(item for item in indInfo[i] if "FAMS" in item))
@@ -130,8 +130,8 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
                 child = True
                 childFam = "{'" + indInfo[i][indexOfFamC][7:] + "'}"
             elif "DEAT" in item:
-            #print("inside death...")
-                list_deceased(i)
+                #print("inside death...", indInfo, i)
+                list_deceased(i, indInfo[i])
                 
 
         if indInfo[i][4][8] == " " :
@@ -159,6 +159,8 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
         wifeName = ""
         children = "{"
         for j in range(len(famInfo[i])):
+            # print("fam info.....", famInfo[i])
+             #print("-----------")
             if "CHIL" in famInfo[i][j]:
                 children += "'"
                 children += famInfo[i][j][7:]
@@ -175,10 +177,12 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
                 wifeName = spouseArray[spouseArray.index(wifeID) + 1]
 
             if "MARR" in famInfo[i][j]:
-            # print("indie marr value...", famInfo[i][5][6:])
-                marriage = famInfo[i][5][6:]
+               indexOfMarrDate = famInfo[i].index(next(item for item in famInfo[i] if "MARR" in item))
+               # print("index of marr date...", indexOfMarrDate)
+                #print("-----------")
+               marriage = famInfo[i][indexOfMarrDate+1][6:]
             if "DIV" in famInfo[i][j]:
-            # print("indie div value...", famInfo[i][7][6:])
+                # print("indie div value...", famInfo[i][7][6:])
                 divorce = famInfo[i][7][6:]
         #  print(" ")
         
@@ -186,7 +190,7 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
 
     familyTable.add_row([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
     families.append([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
-
+    marriage_after_14(marriage,husbID, wifeID,indInfo)
     list_large_age_differences(husbID, wifeID)
 
     individualTable.sortby = "ID"
@@ -204,12 +208,6 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
 
     #large age difference
     
-
-
-        
-
-        
-
 
 #US01
 def dates_before_current_date():
@@ -264,9 +262,36 @@ def birth_before_death_of_parents():
     print("[NOT IMPLEMENTED] US09: Birth before death of parents")
 
 #US10
-def marriage_after_14():
+def marriage_after_14(marriage,husbID, wifeID,indInfo):
     #Marriage should be at least 14 years after birth of both spouses (parents must be at least 14 years old)
-    print("[NOT IMPLEMENTED] US10: Marriage after 14")
+    #print("[IN PROGRESS] US10: Marriage after 14")
+   # print("marriage date..", marriage)
+   # print("Husb ID..", husbID)
+   # print("wide Id..", wifeID)
+    for i in range(len(indInfo)):
+         #print("indi info inside marriage after 14..", indInfo[i])
+        for item in indInfo[i]:
+            if husbID in item:
+                #print("inside item....,", item)
+                indexOfHusbBirth = indInfo[i].index(next(item for item in indInfo[i] if "BIRT" in item))
+                #print("index of husb birth...,", indInfo[i][indexOfHusbBirth+1][13:])
+                husbDOB = indInfo[i][indexOfHusbBirth+1][13:]
+            if wifeID in item:
+               # print("inside item wife......,", item)
+                indexOfWifeBirth = indInfo[i].index(next(item for item in indInfo[i] if "BIRT" in item))
+                #print("index of wife birth...,", indInfo[i][indexOfWifeBirth+1][13:])
+                wifeDOB = indInfo[i][indexOfWifeBirth+1][13:]
+
+    marriageDate  = []
+    marriageDate = marriage.rsplit()
+   # print("marriage date...",marriageDate[2])
+    husbDOBatMarr = int(marriageDate[2]) - int(husbDOB)
+    wifeDOBatMarr = int(marriageDate[2]) - int(wifeDOB)
+    if(husbDOBatMarr < 14 ):
+        print("ERROR: US10 - Husband DOB < 14 at the time of marriage")
+    if(wifeDOBatMarr < 14 ):
+        print("ERROR: US10 - Wife DOB < 14 at the time of marriage")
+
 
 #US11
 def no_bigamy():
@@ -325,19 +350,18 @@ def include_individual_ages(dob):
     #Output: age of individual
     return current_year - int(dob)
     
-    
-
 
 #US29
-def list_deceased(index):
+def list_deceased(index, indiInfo):
     #List all deceased individuals in a GEDCOM file
     #Input: index of individual
     #Output: dead array
-    
+    #print("death date is..",index)
+    #print("indiInfo is..",indiInfo)
     alive = False
-    deathDate = indInfo[index][6][6:]
+   # deathDate = indiInfo[index][6][6:]
     #add to dead array
-    dead += [indInfo[index][0][2:6]]
+   # dead += [indiInfo[index][0][2:6]]
 
 #US30
 def list_living_married():
