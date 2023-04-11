@@ -2,7 +2,7 @@
 1 NAME Daughter /Jim/
 1 SEX F
 1 BIRT
-2 DATE 30 NOV 2000
+2 DATE 10 NOV 2000
 1 FAMC @F2@
 0 @I2@ INDI
 1 NAME Dad /Jim/

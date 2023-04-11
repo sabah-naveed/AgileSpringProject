@@ -7,15 +7,24 @@
 #imports
 import datetime
 from prettytable import PrettyTable
+from datetime import datetime, timedelta
 
 #global variables commonly used among stories
-current_year = datetime.datetime.now().year
+
+validMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+
+current_year = datetime.now().year
+current_month_num = datetime.now().month
+current_month = validMonths[current_month_num - 1]
+current_day = datetime.now().day
 
 individualTable = PrettyTable()
 individualTable.field_names = ["ID", "Name", "Gender", "Birthday", "Age", "Alive", "Death", "Child", "Spouse"]
 
 familyTable = PrettyTable()
 familyTable.field_names = ["ID", "Married", "Divorced", "Husband ID", "Husband Name", "Wife ID", "Wife Name", "Children"]
+
+validMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
 
 individuals = []
 families = []
@@ -403,12 +412,37 @@ def list_large_age_differences(hID, wID):
 #US35
 def list_recent_births():
     #List all people in a GEDCOM file who were born in the last 30 days
-    print("[NOT IMPLEMENTED] US35: List recent births")
+    for i in individuals:
+        if len(i) > 3 and i[3] and i[3] != "N/A":
+            #print(i[3])
+            #print(current_day, current_month, current_year)
+
+            date_format = "%d %b %Y"
+            a = datetime.strptime(i[3], date_format)
+            b = datetime.strptime(str(current_day) + " " + str(current_month) + " " + str(current_year), date_format)
+
+            delta = b - a
+            #print(delta.days)
+            if delta.days < 30 and delta.days > 0:
+                print("This person", i[0] , "was born in the last 30 days")
+
 
 #US36
 def list_recent_deaths():
     #List all people in a GEDCOM file who died in the last 30 days
-    print("[NOT IMPLEMENTED] US36: List recent deaths")
+    for i in individuals:
+        if len(i) > 3 and i[6] and i[6] != "N/A":
+            #print(i[3])
+            #print(current_day, current_month, current_year)
+
+            date_format = "%d %b %Y"
+            a = datetime.strptime(i[6], date_format)
+            b = datetime.strptime(str(current_day) + " " + str(current_month) + " " + str(current_year), date_format)
+
+            delta = b - a
+            #print(delta.days)
+            if delta.days < 30 and delta.days > 0:
+                print("This person", i[0] , "died in the last 30 days")
 
 #US38
 def list_upcoming_birthdays():
@@ -424,7 +458,6 @@ def list_upcoming_anniversaries():
 def invalid_date(d):
     #Check for invalid dates
     #input: date in ["day", "month", "year"] format
-    validMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
     if d[1] not in validMonths:
         print("Error: Invalid date; wrong month")
     if int(d[2]) > current_year:
@@ -445,6 +478,8 @@ def main():
     #main
 
     outArray = parse_file("gedexample.txt", individuals, families, indInfo, spouseArray, [], [])
+    list_recent_births()
+    list_recent_deaths()
 
 
 if __name__ == '__main__':
