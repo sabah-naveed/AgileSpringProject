@@ -15,4 +15,8 @@ ERROR: US10 - Wife DOB < 14 at the time of marriage
 Individuals that are less than 150 years old
 ['@I1@', '@I2@', '@I3@']
 Individuals that have passed away
+<<<<<<< HEAD
 ['@I2@']
+=======
+[]
+>>>>>>> 40fdd6a (fix file name issue)
