@@ -178,11 +178,29 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
             if "HUSB" in famInfo[i][j]:
                 husbID = famInfo[i][j][7:]
                 # print('huband id...',husbID)
+                # print('spouce array is...',indInfo)
+                for k in range(len(indInfo[j])):
+                    indexOfHusbGender = indInfo[j].index(next(item for item in indInfo[j] if "SEX" in item))
+                    # print("index is..", indInfo[j][indexOfHusbGender])
+                    if 'M' in indInfo[j][indexOfHusbGender]:
+                        continue
+                    else:
+                        print('ERROR: US21 - HUSB gender is not Male (M)')
+                    break
                 husbName = spouseArray[spouseArray.index(husbID) + 1]
 
             if "WIFE" in famInfo[i][j]:
                 wifeID = famInfo[i][j][7:]
-                #print('wifeID id...',wifeID)
+               #  print('wifeID id...',wifeID)
+                for k in range(len(indInfo[j])):
+                     #print('k is..', indInfo[j])
+                    indexOfWifeGender = indInfo[j].index(next(item for item in indInfo[j] if "SEX" in item))
+                    # print("index is..", indInfo[j][indexOfWifeGender])
+                    if 'F' in indInfo[j][indexOfHusbGender]:
+                        continue
+                    else:
+                        print('ERROR: US21 - WIFE gender is not Female (F)')
+                    break
                 wifeName = spouseArray[spouseArray.index(wifeID) + 1]
 
             if "MARR" in famInfo[i][j]:
@@ -336,6 +354,12 @@ def first_cousins_should_not_marry():
 def aunts_and_uncles():
     #Aunts and uncles should not marry their nieces or nephews, their siblings’ children
     print("[NOT IMPLEMENTED] US20: Aunts and uncles")
+
+#US21
+def correct_gender_forRole():
+    #Husband in family should be male and wife in family should be female
+    print("[IMPLEMENTED] US21: Correct Gender for role")
+
 
 #US22
 def unique_ids():
