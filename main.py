@@ -19,6 +19,7 @@ familyTable.field_names = ["ID", "Married", "Divorced", "Husband ID", "Husband N
 
 individuals = []
 families = []
+individual_id = []
 
 indInfo = []
 spouseArray = []
@@ -147,7 +148,29 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
 
         individualTable.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
         individuals.append([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
+        individual_id.append([indInfo[i][0][2:6]])
+    
+    # US22: finding duplicate id's -- not completed
+    # print("indi table:", individual_id)
+    # new_array = [elem[0] for elem in individual_id]
+    # print("new array...",new_array)
+    # frequency = {}
+    # for value in new_array:
+    #     if value in frequency:
+    #        frequency[value] += 1
+    #     else:
+    #       frequency[value] = 1
 
+    # duplicate_values = []
+    # for key, value in frequency.items():
+    #  if value > 1:
+    #     duplicate_values.append(key)
+
+    # print("Duplicate values in the array:", duplicate_values)   
+    
+    # for i in range(len(individuals)):
+    #     for j in range(len(individuals[i])):
+    #         print("inside individuals...",individuals[i][j])
 
 
     for i in range(len(famInfo)):
@@ -205,7 +228,6 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
         #  print(" ")
         
     children += "}"
-
     familyTable.add_row([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
     families.append([famInfo[i][0][2:6], marriage, divorce, husbID, husbName, wifeID, wifeName, children])
     marriage_after_14(marriage,husbID, wifeID,indInfo)
