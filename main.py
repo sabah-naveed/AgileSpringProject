@@ -31,6 +31,7 @@ families = []
 
 indInfo = []
 spouseArray = []
+famInfo = []
 
 
 #parse file
@@ -90,7 +91,6 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
         indInfo.append(tempInd)
 
     #getting info needed for fam
-    famInfo = []
     for i in range(len(families)):
     #print(individuals[i][1])
         if 'FAM' in families[i]:
@@ -475,8 +475,35 @@ def list_upcoming_birthdays():
 #US39
 def list_upcoming_anniversaries():
     #List all living couples in a GEDCOM file whose marriage anniversaries occur in the next 30 days
-    print("[NOT IMPLEMENTED] US39: List upcoming anniversaries")
+    
+    #print(famInfo)
+    #print(spouseArray)
+    marriedBool = False
+    for i in famInfo[0]:
+            #print(i[3])
+            #print(current_day, current_month, current_year)
+        if marriedBool:
+            date_format = "%d %b %Y"
+            #print(i[7:])
+            anniversary = datetime.strptime(i[7:], date_format)
+            #print(anniversary)
+            #change year to current year
+            anniversary = anniversary.replace(year = current_year)
+            #print(birthday)
+            #print("---")
+            today = datetime.strptime(str(current_day) + " " + str(current_month) + " " + str(current_year), date_format)
 
+            delta = anniversary - today
+            #print(delta.days)
+            
+            if delta.days < 30 and delta.days > 0:
+                print("Husband and wife of family", famInfo[0][0][2:6] , "have an anniversary in the next 30 days.")
+
+            marriedBool = False
+        if i[2:6] == "MARR":
+            #print("marr hit")
+            marriedBool = True
+            
 
 #US42
 def invalid_date(d):
@@ -506,6 +533,7 @@ def main():
     list_recent_deaths()
 
     list_upcoming_birthdays()
+    list_upcoming_anniversaries()
 
 
 if __name__ == '__main__':
