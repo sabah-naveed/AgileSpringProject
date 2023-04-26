@@ -104,10 +104,13 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
             tempFam.append(lines[indexFamAt])
             indexFamAt += 1
 
-            while(lines[indexFamAt][0] != "0"):
+            print(lines)
+            while(indexFamAt < len(lines) and lines[indexFamAt][0] != "0"):
             #print("getting fam tab")
                 tempFam.append(lines[indexFamAt])
                 indexFamAt += 1
+
+                
             
             famInfo.append(tempFam)
     
@@ -191,7 +194,7 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
                 #print("-----------")
                marriage = famInfo[i][indexOfMarrDate+1][6:]
             if "DIV" in famInfo[i][j]:
-                # print("indie div value...", famInfo[i][7][6:])
+                #print("indie div value...", famInfo[i][7][6:])
                 divorce = famInfo[i][7][6:]
         #  print(" ")
         
@@ -448,7 +451,6 @@ def list_recent_deaths():
 #US38
 def list_upcoming_birthdays():
     #List all living people in a GEDCOM file whose birthdays occur in the next 30 days
-    #print("[NOT IMPLEMENTED] US38: List upcoming birthdays")
     #print(individuals)
     for i in individuals:
         if len(i) > 3 and i[3] and i[3] != "N/A":
@@ -474,6 +476,7 @@ def list_upcoming_birthdays():
 def list_upcoming_anniversaries():
     #List all living couples in a GEDCOM file whose marriage anniversaries occur in the next 30 days
     print("[NOT IMPLEMENTED] US39: List upcoming anniversaries")
+
 
 #US42
 def invalid_date(d):
