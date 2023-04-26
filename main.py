@@ -32,6 +32,7 @@ families = []
 indInfo = []
 spouseArray = []
 famInfo = []
+linesIF = []
 
 
 #parse file
@@ -222,9 +223,31 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
     
 
 #US01
-def dates_before_current_date():
+def dates_before_current_date(filename):
     #Dates (birth, marriage, divorce, death) should not be after the current date
-    print("[NOT IMPLEMENTED] US01: Dates before current date")
+    
+    f = open(filename, "r")
+    contents = f.read()
+    linesUS = contents.splitlines()
+    #print(linesUS)
+    dateBool = False
+    for i in linesUS:
+        if dateBool == True:
+            if "DATE" in i:
+                date = i[7:]
+                #put date in correct format 
+                date_format = "%d %b %Y"
+                date = datetime.strptime(date, date_format)
+                today = datetime.today()
+                #print(date)
+                #print(today)
+                if date > today:
+                    print("ERROR: US01: The following date is before current date:", date)
+                    dateBool = False
+        if "BIRT" in i or "MARR" in i or "DIV" in i or "DEAT" in i:
+            dateBool = True
+
+
 
 #US02
 def birth_before_marriage():
@@ -503,7 +526,7 @@ def list_upcoming_anniversaries():
         if i[2:6] == "MARR":
             #print("marr hit")
             marriedBool = True
-            
+
 
 #US42
 def invalid_date(d):
@@ -534,6 +557,8 @@ def main():
 
     list_upcoming_birthdays()
     list_upcoming_anniversaries()
+
+    dates_before_current_date("gedexample.txt")
 
 
 if __name__ == '__main__':
