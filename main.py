@@ -4,8 +4,6 @@
 #  I pledge my honor that I have abided by the Stevens Honor System.        #
 #############################################################################         
 
-#test comit
-
 #imports
 import datetime
 from prettytable import PrettyTable
@@ -296,12 +294,13 @@ def marriage_after_14(marriage,husbID, wifeID,indInfo):
     marriageDate  = []
     marriageDate = marriage.rsplit()
    # print("marriage date...",marriageDate[2])
-    husbDOBatMarr = int(marriageDate[2]) - int(husbDOB)
-    wifeDOBatMarr = int(marriageDate[2]) - int(wifeDOB)
-    if(husbDOBatMarr < 14 ):
-        print("ERROR: US10 - Husband DOB < 14 at the time of marriage")
-    if(wifeDOBatMarr < 14 ):
-        print("ERROR: US10 - Wife DOB < 14 at the time of marriage")
+    if (len(marriageDate) > 2):
+        husbDOBatMarr = int(marriageDate[2]) - int(husbDOB)
+        wifeDOBatMarr = int(marriageDate[2]) - int(wifeDOB)
+        if(husbDOBatMarr < 14 ):
+            print("ERROR: US10 - Husband DOB < 14 at the time of marriage")
+        if(wifeDOBatMarr < 14 ):
+            print("ERROR: US10 - Wife DOB < 14 at the time of marriage")
 
 
 #US11
@@ -449,7 +448,27 @@ def list_recent_deaths():
 #US38
 def list_upcoming_birthdays():
     #List all living people in a GEDCOM file whose birthdays occur in the next 30 days
-    print("[NOT IMPLEMENTED] US38: List upcoming birthdays")
+    #print("[NOT IMPLEMENTED] US38: List upcoming birthdays")
+    #print(individuals)
+    for i in individuals:
+        if len(i) > 3 and i[3] and i[3] != "N/A":
+            #print(i[3])
+            #print(current_day, current_month, current_year)
+
+            date_format = "%d %b %Y"
+            birthday = datetime.strptime(i[3], date_format)
+            #print(birthday)
+            #change year to current year
+            birthday = birthday.replace(year = current_year)
+            #print(birthday)
+            #print("---")
+            today = datetime.strptime(str(current_day) + " " + str(current_month) + " " + str(current_year), date_format)
+
+            delta = birthday - today
+            #print(delta.days)
+            
+            if delta.days < 30 and delta.days > 0:
+                print(i[1] , "has a birthday in the next 30 days.")
 
 #US39
 def list_upcoming_anniversaries():
@@ -482,6 +501,8 @@ def main():
     outArray = parse_file("gedexample.txt", individuals, families, indInfo, spouseArray, [], [])
     list_recent_births()
     list_recent_deaths()
+
+    list_upcoming_birthdays()
 
 
 if __name__ == '__main__':
