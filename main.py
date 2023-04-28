@@ -252,7 +252,47 @@ def dates_before_current_date(filename):
 #US02
 def birth_before_marriage():
     #Birth should occur before marriage of an individual
-    print("[NOT IMPLEMENTED] US02: Birth before marriage")
+    #print("individual: \n", individuals)
+    bbmList = ["h", "w", "m"]
+    #print("family: \n", famInfo)
+    marrBool = False
+    for i in range(len(famInfo)):
+        for j in famInfo[i]:
+            if marrBool:
+                bbmList[2] = j[7:]
+                marrBool = False
+            if "HUSB" in j:
+                husbID = j[7:]
+                bbmList[0] = husbID
+                #print("husbID: ", husbID)
+            if "WIFE" in j:
+                wifeID = j[7:]
+                bbmList[1] = wifeID
+                #print("wifeID: ", wifeID)
+            if "MARR" in j:
+                marrBool = True
+    #print("bbmList: ", bbmList)
+    #find dates of these individuals and compare them
+    coupleBirths = ["h", "w"]
+    for i in range(len(individuals)):
+        if individuals[i][0] == bbmList[0]:
+            husbBirth = individuals[i][3]
+            coupleBirths[0] = husbBirth
+        if individuals[i][0] == bbmList[1]:
+            wifeBirth = individuals[i][3]
+            coupleBirths[1] = wifeBirth
+    #print("coupleBirths: ", coupleBirths)
+
+    #compare dates to see if birth before marriage
+    date_format = "%d %b %Y"
+    husbBirth = datetime.strptime(husbBirth, date_format)
+    wifeBirth = datetime.strptime(wifeBirth, date_format)
+    marr = datetime.strptime(bbmList[2], date_format)
+    if husbBirth > marr:
+        print("ERROR: US02: Birth before marriage for husband")
+    if wifeBirth > marr:
+        print("ERROR: US02: Birth before marriage for wife")
+
 
 #US03
 def birth_before_death():
@@ -559,6 +599,8 @@ def main():
     list_upcoming_anniversaries()
 
     dates_before_current_date("gedexample.txt")
+
+    birth_before_marriage()
 
 
 if __name__ == '__main__':
