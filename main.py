@@ -34,9 +34,10 @@ spouseArray = []
 famInfo = []
 linesIF = []
 
+dead = []
 
 #parse file
-def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan150, dead):
+def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan150):
     #parse the file and do initial population
     #Input: filename
 
@@ -44,6 +45,8 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
     f = open(filename, "r")
     contents = f.read()
     lines = contents.splitlines()
+
+    list_deceased(filename)
 
     rest = ""
     for l in lines:
@@ -117,6 +120,7 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
     
     f.close()
 
+    
     #do individual table --> print('individual table..', indInfo)
     for i in range(len(indInfo)):
         child = False
@@ -144,7 +148,9 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
                 childFam = "{'" + indInfo[i][indexOfFamC][7:] + "'}"
             elif "DEAT" in item:
                 #print("inside death...", indInfo, i)
-                list_deceased(i, indInfo[i])
+                #print("inside indinfo\n", indInfo[i])
+                #list_deceased(filename)
+                print("DEAT found")
                 
 
         if indInfo[i][4][8] == " " :
@@ -158,7 +164,8 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
         if less_than_150_years_old(age):
             lessThan150 += [indInfo[i][0][2:6]]
 
-        individualTable.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
+        print(dead)
+        individualTable.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, "False" if (indInfo[i][0][2:6] in dead) else "True", deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
         individuals.append([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
 
 
@@ -295,9 +302,15 @@ def birth_before_marriage():
 
 
 #US03
-def birth_before_death():
+def birth_before_death(filename):
     #Birth should occur before death of an individual
-    print("[NOT IMPLEMENTED] US03: Birth before death")
+    
+    print("individual: \n", individuals)
+    f = open(filename, "r")
+    contents = f.read()
+    lines = contents.splitlines()
+
+
 
 #US04
 def marriage_before_divorce():
@@ -428,16 +441,32 @@ def include_individual_ages(dob):
     
 
 #US29
-def list_deceased(index, indiInfo):
+def list_deceased(filename):
     #List all deceased individuals in a GEDCOM file
     #Input: index of individual
     #Output: dead array
     #print("death date is..",index)
     #print("indiInfo is..",indiInfo)
-    alive = False
-   # deathDate = indiInfo[index][6][6:]
-    #add to dead array
-   # dead += [indiInfo[index][0][2:6]]
+    
+    #go through lines and find individual ids for those who are dead
+    
+    f = open(filename, "r")
+    contents = f.read()
+    lines = contents.splitlines()
+    currentIndividual = ""
+    print("lines are:: ",lines)
+    for line in lines:
+        #if '0 @Ix@ INDI' type of line reached
+        if "INDI" in line:
+            currentIndividual = line[2:6]
+            print("current individual is:: ",currentIndividual)
+        #if '1 DEAT' type of line reached
+        if "DEAT" in line:
+            #print("DEAT line reached..",line)
+            dead.append(currentIndividual)
+    print("dead array is:: ",dead)
+
+    
 
 #US30
 def list_living_married():
@@ -591,7 +620,7 @@ def invalid_date(d):
 def main():
     #main
 
-    outArray = parse_file("gedexample.txt", individuals, families, indInfo, spouseArray, [], [])
+    outArray = parse_file("gedexample.txt", individuals, families, indInfo, spouseArray, [])
     list_recent_births()
     list_recent_deaths()
 
@@ -601,6 +630,7 @@ def main():
     dates_before_current_date("gedexample.txt")
 
     birth_before_marriage()
+    birth_before_death("gedexample.txt")
 
 
 if __name__ == '__main__':
