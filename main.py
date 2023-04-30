@@ -590,7 +590,13 @@ def no_marriages_to_descendants():
 #US18
 def siblings_should_not_marry():
     #Siblings should not marry one another
-    print("[NOT IMPLEMENTED] US18: Siblings should not marry")
+    #print(individuals)
+    for i in range(len(individuals)):
+        if len(individuals[i]) > 3:
+            if individuals[i][7] == individuals[i][8]:
+                print("ERROR: US18: Siblings should not marry")
+                
+
 
 #US19
 def first_cousins_should_not_marry():
@@ -610,7 +616,17 @@ def unique_ids():
 #US23
 def unique_name_and_birth_date():
     #No more than one individual with the same name and birth date should appear in a GEDCOM file
-    print("[NOT IMPLEMENTED] US23: Unique name and birth date")
+    dictNameBday = {}
+    for i in range(len(individuals)):
+        if len(individuals[i]) > 3:
+            if individuals[i][1] in dictNameBday:
+                if individuals[i][3] in dictNameBday[individuals[i][1]]:
+                    print("ERROR: US23: Individual with same name and birth date")
+                else:
+                    dictNameBday[individuals[i][1]].append(individuals[i][3])
+            else:
+                dictNameBday[individuals[i][1]] = [individuals[i][3]]
+    #print(dictNameBday)
 
 #US24
 def unique_families_by_spouses():
@@ -690,12 +706,12 @@ def list_living_married():
 #US31
 def list_living_single():
     #List all living people over 30 who have never been married in a GEDCOM file
-    print(individuals)
+    #print(individuals)
     singles = []
     for i in range(len(individuals)):
         if len(individuals[i]) > 3:
             if individuals[i][8] == "N/A" and individuals[i][5] != "False" and individuals[i][4] > 30:
-                print("single", individuals[i][1])
+                #print("single", individuals[i][1])
                 singles.append(individuals[i][1])
     print("living single over 30: ", singles)
 
@@ -863,6 +879,9 @@ def main():
 
     list_living_married()
     list_living_single()
+
+    unique_name_and_birth_date()
+    siblings_should_not_marry()
 
 
 if __name__ == '__main__':
