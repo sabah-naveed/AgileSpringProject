@@ -9,6 +9,7 @@ import datetime
 from prettytable import PrettyTable
 from datetime import datetime, timedelta
 
+
 #global variables commonly used among stories
 
 validMonths = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
@@ -332,8 +333,7 @@ def birth_before_death(filename):
 #US04
 def marriage_before_divorce():
     #Marriage should occur before divorce of spouses, and divorce can only occur after marriage
-    print("[NOT IMPLEMENTED] US04: Marriage before divorce")
-    print(famInfo)
+    #print(famInfo)
     marrBool = False
     for i in range(len(famInfo)):
         for f in famInfo[i]:
@@ -382,7 +382,7 @@ def marriage_before_death():
         if individuals[i][0] == bbmList[1]:
             wifeDeath = individuals[i][6]
             coupleDeaths[1] = wifeDeath
-    print(coupleDeaths)
+    #print(coupleDeaths)
     if coupleDeaths[0] != "N/A":
         if datetime.strptime(bbmList[2], "%d %b %Y") > datetime.strptime(coupleDeaths[0], "%d %b %Y"):
             print("ERROR: US05: Marriage after death for husband")
@@ -393,7 +393,7 @@ def marriage_before_death():
 #US06
 def divorce_before_death():
     #Divorce can only occur before death of both spouses
-    print("[NOT IMPLEMENTED] US06: Divorce before death")
+    
     bbmList = ["h", "w", "d"]
     #print("family: \n", famInfo)
     divBool = False
@@ -422,7 +422,7 @@ def divorce_before_death():
             wifeDeath = individuals[i][6]
             coupleDeaths[1] = wifeDeath
 
-    print(coupleDeaths)
+    #print(coupleDeaths)
     if coupleDeaths[0] != "N/A":
         if datetime.strptime(bbmList[2], "%d %b %Y") > datetime.strptime(coupleDeaths[0], "%d %b %Y"):
             print("ERROR: US05: Divorce after death for husband")
@@ -446,6 +446,46 @@ def less_than_150_years_old(a):
 def birth_before_marriage_of_parents():
     #Children should be born after marriage of parents (and not more than 9 months after their divorce)
     print("[NOT IMPLEMENTED] US08: Birth before marriage of parents")
+    print("family: \n", famInfo)
+    childID = ""
+    marrBool = False
+    divBool = False
+    marr = ""
+    div = ""
+    for i in range(len(famInfo)):
+        for j in famInfo[i]:
+            if marrBool:
+                marr = j[7:]
+                marr = datetime.strptime(marr, "%d %b %Y")
+                print("marr: ", marr)
+                marrBool = False
+            if divBool:
+                div = j[7:]
+                div = datetime.strptime(div, "%d %b %Y")
+                
+                print("div: ", div)
+                divBool = False
+            if "CHIL" in j:
+                childID = j[7:]
+                print("childID: ", childID)
+            if "MARR" in j:
+                marrBool = True
+            if "DIV" in j:
+                divBool = True
+        for i in range(len(individuals)):
+            if individuals[i][0] == childID:
+                childBirth = individuals[i][3]
+                print("childBirth: ", childBirth)
+                childBirth = datetime.strptime(childBirth, "%d %b %Y")
+                print("childBirth: ", childBirth)
+            
+        if childBirth < marr:
+            print("ERROR: US08: Birth before marriage of parents")
+        if childBirth > div:
+            print("ERROR: US08: Birth after divorce of parents")
+            
+
+
 
 #US09
 def birth_before_death_of_parents():
@@ -747,6 +787,10 @@ def main():
 
     marriage_before_divorce()
     marriage_before_death()
+
+    divorce_before_death()
+
+    birth_before_marriage_of_parents()
 
 
 if __name__ == '__main__':
