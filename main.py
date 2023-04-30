@@ -690,7 +690,14 @@ def list_living_married():
 #US31
 def list_living_single():
     #List all living people over 30 who have never been married in a GEDCOM file
-    print("[NOT IMPLEMENTED] US31: List living single")
+    print(individuals)
+    singles = []
+    for i in range(len(individuals)):
+        if len(individuals[i]) > 3:
+            if individuals[i][8] == "N/A" and individuals[i][5] != "False" and individuals[i][4] > 30:
+                print("single", individuals[i][1])
+                singles.append(individuals[i][1])
+    print("living single over 30: ", singles)
 
 #US32
 def list_multiple_births():
@@ -855,6 +862,7 @@ def main():
     birth_before_death_of_parents()
 
     list_living_married()
+    list_living_single()
 
 
 if __name__ == '__main__':
