@@ -1,22 +1,22 @@
-ERROR: US10 - Husband DOB < 14 at the time of marriage
-ERROR: US10 - Wife DOB < 14 at the time of marriage
-+------+----------------+--------+-------------+-----+-------+-------+----------+----------+
-|  ID  |      Name      | Gender |   Birthday  | Age | Alive | Death |  Child   |  Spouse  |
-+------+----------------+--------+-------------+-----+-------+-------+----------+----------+
-| @I1@ | Daughter /Jim/ |   F    | 30 NOV 2000 |  23 |  True |  N/A  | {'@F2@'} |   N/A    |
-| @I2@ |   Dad /Jim/    |   M    | 12 JUL 1999 |  24 |  True |  N/A  |   N/A    | {'@F2@'} |
-| @I3@ |   Mom /Jim/    |   F    |  6 JAN 1999 |  24 |  True |  N/A  |   N/A    | {'@F2@'} |
-+------+----------------+--------+-------------+-----+-------+-------+----------+----------+
-+------+-------------+-------------+------------+--------------+---------+-----------+----------+
-|  ID  |   Married   |   Divorced  | Husband ID | Husband Name | Wife ID | Wife Name | Children |
-+------+-------------+-------------+------------+--------------+---------+-----------+----------+
-| @F2@ |  4 APR 1999 |  6 JUN 2005 |    @I2@    |  Dad /Jim/   |   @I3@  | Mom /Jim/ | {'@I1@'} |
-+------+-------------+-------------+------------+--------------+---------+-----------+----------+
+dead array is::  ['@I2@']
++------+----------------+--------+-------------+-----+-------+-------------+----------+----------+
+|  ID  |      Name      | Gender |   Birthday  | Age | Alive |    Death    |  Child   |  Spouse  |
++------+----------------+--------+-------------+-----+-------+-------------+----------+----------+
+| @I1@ | Daughter /Jim/ |   F    | 10 NOV 2000 |  23 |  True |     N/A     | {'@F2@'} |   N/A    |
+| @I2@ |   Dad /Jim/    |   M    | 12 JUL 1999 |  24 | False | 13 JUN 1998 |   N/A    | {'@F2@'} |
+| @I3@ |   Mom /Jim/    |   F    |  6 JAN 1999 |  24 |  True |     N/A     |   N/A    | {'@F2@'} |
++------+----------------+--------+-------------+-----+-------+-------------+----------+----------+
++------+--------------+-------------+------------+--------------+---------+-----------+----------+
+|  ID  |   Married    |   Divorced  | Husband ID | Husband Name | Wife ID | Wife Name | Children |
++------+--------------+-------------+------------+--------------+---------+-----------+----------+
+| @F2@ |  27 APR 2020 |  6 JUN 2005 |    @I2@    |  Dad /Jim/   |   @I3@  | Mom /Jim/ | {'@I1@'} |
++------+--------------+-------------+------------+--------------+---------+-----------+----------+
 Individuals that are less than 150 years old
 ['@I1@', '@I2@', '@I3@']
 Individuals that have passed away
-<<<<<<< HEAD
 ['@I2@']
-=======
-[]
->>>>>>> 40fdd6a (fix file name issue)
+ERROR: US03: Birth before death for individual @I2@
+ERROR: US04: Marriage after divorce
+ERROR: US05: Marriage after death for husband
+ERROR: US05: Divorce after death for husband
+ERROR: US08: Birth before marriage of parents

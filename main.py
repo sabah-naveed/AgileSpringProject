@@ -572,11 +572,6 @@ def marriage_after_14(marriage,husbID, wifeID,indInfo):
             print("ERROR: US10 - Wife DOB < 14 at the time of marriage")
 
 
-#US11
-def no_bigamy():
-    #Marriage should not occur during marriage to another spouse; No more than one marriage at a time
-    print("[NOT IMPLEMENTED] US11: No bigamy")
-
 #US12
 def parents_not_too_old():
     #Mother should be less than 60 years older than her children and father should be less than 80 years older than his children
@@ -671,7 +666,26 @@ def list_deceased(filename):
 #US30
 def list_living_married():
     #List all living married people in a GEDCOM file
-    print("[NOT IMPLEMENTED] US30: List living married")
+    #print("famInfo", famInfo)
+    livingMarried = []
+    for i in range(len(famInfo)):
+        marrList = ["h", "w"]
+        for j in famInfo[i]:
+            if "HUSB" in j:
+                #print("HUSB",j)
+                marrList[0] = j[7:]
+            if "WIFE" in j:
+                #print("WIFE",j)
+                marrList[1] = j[7:]
+        #print(individuals)
+        for x in individuals:
+            if x[0] == marrList[0]:
+                if x[5] != "False":
+                    livingMarried.append(x[1])
+            if x[0] == marrList[1]:
+                if x[5] != "False":
+                    livingMarried.append(x[1])
+    print("living married", livingMarried)
 
 #US31
 def list_living_single():
@@ -839,6 +853,8 @@ def main():
 
     birth_before_marriage_of_parents()
     birth_before_death_of_parents()
+
+    list_living_married()
 
 
 if __name__ == '__main__':
