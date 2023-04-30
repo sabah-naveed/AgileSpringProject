@@ -333,6 +333,23 @@ def birth_before_death(filename):
 def marriage_before_divorce():
     #Marriage should occur before divorce of spouses, and divorce can only occur after marriage
     print("[NOT IMPLEMENTED] US04: Marriage before divorce")
+    print(famInfo)
+    marrBool = False
+    for i in range(len(famInfo)):
+        for f in famInfo[i]:
+            if marrBool:
+                if "DATE" in f:
+                    div = f[7:]
+                    #print("div: ", div)
+                    marrBool = False
+            elif "DATE" in f:
+                marrBool = True
+                marr = f[7:]
+                #print("marr: ", marr)
+        #if marriage is after divorce
+        if datetime.strptime(marr, "%d %b %Y") > datetime.strptime(div, "%d %b %Y"):
+            print("ERROR: US04: Marriage before divorce")
+        
     
 
 #US05
