@@ -445,8 +445,8 @@ def less_than_150_years_old(a):
 #US08
 def birth_before_marriage_of_parents():
     #Children should be born after marriage of parents (and not more than 9 months after their divorce)
-    print("[NOT IMPLEMENTED] US08: Birth before marriage of parents")
-    print("family: \n", famInfo)
+    
+    #print("family: \n", famInfo)
     childID = ""
     marrBool = False
     divBool = False
@@ -457,17 +457,17 @@ def birth_before_marriage_of_parents():
             if marrBool:
                 marr = j[7:]
                 marr = datetime.strptime(marr, "%d %b %Y")
-                print("marr: ", marr)
+                #print("marr: ", marr)
                 marrBool = False
             if divBool:
                 div = j[7:]
                 div = datetime.strptime(div, "%d %b %Y")
-                
-                print("div: ", div)
+                #print("div: ", div)
+                div = div + timedelta(days=270)
                 divBool = False
             if "CHIL" in j:
                 childID = j[7:]
-                print("childID: ", childID)
+                #print("childID: ", childID)
             if "MARR" in j:
                 marrBool = True
             if "DIV" in j:
@@ -475,9 +475,9 @@ def birth_before_marriage_of_parents():
         for i in range(len(individuals)):
             if individuals[i][0] == childID:
                 childBirth = individuals[i][3]
-                print("childBirth: ", childBirth)
+                #print("childBirth: ", childBirth)
                 childBirth = datetime.strptime(childBirth, "%d %b %Y")
-                print("childBirth: ", childBirth)
+                #print("childBirth: ", childBirth)
             
         if childBirth < marr:
             print("ERROR: US08: Birth before marriage of parents")
@@ -490,7 +490,54 @@ def birth_before_marriage_of_parents():
 #US09
 def birth_before_death_of_parents():
     #Child should be born before death of mother and before 9 months after death of father
-    print("[NOT IMPLEMENTED] US09: Birth before death of parents")
+    #print("family: \n", famInfo)
+    childID = ""
+    husbID = ""
+    wifeID = ""
+    childBirth = ""
+    husbDeath = ""
+    wifeDeath = ""
+    for i in range(len(famInfo)):
+        for j in famInfo[i]:
+            if "CHIL" in j:
+                childID = j[7:]
+                #print("childID: ", childID)
+            if "HUSB" in j:
+                husbID = j[7:]
+                #print("husbID: ", husbID)
+            if "WIFE" in j:
+                wifeID = j[7:]
+                #print("wifeID: ", wifeID)
+        for i in range(len(individuals)):
+            if individuals[i][0] == childID:
+                childBirth = individuals[i][3]
+                #print("childBirth: ", childBirth)
+                #convert
+                childBirth = datetime.strptime(childBirth, "%d %b %Y")
+                #print("childBirth: ", childBirth)
+            if individuals[i][0] == husbID:
+                husbDeath = individuals[i][6]
+                #print("husbDeath: ", husbDeath)
+                #convert
+                if husbDeath != "N/A":
+                    husbDeath = datetime.strptime(husbDeath, "%d %b %Y")
+                    #print("husbDeath: ", husbDeath)
+            if individuals[i][0] == wifeID:
+                wifeDeath = individuals[i][6]
+                #print("wifeDeath: ", wifeDeath)
+                #convert
+                if wifeDeath != "N/A":
+                    wifeDeath = datetime.strptime(wifeDeath, "%d %b %Y")
+                    #print("wifeDeath: ", wifeDeath)
+        if wifeDeath != "N/A":
+            if childBirth > wifeDeath:
+                print("ERROR: US09: Birth after death of mother")
+        if husbDeath != "N/A":
+            if childBirth > husbDeath + timedelta(days=270):
+                print("ERROR: US09: Birth after 9 months of death of father")
+
+        
+
 
 #US10
 def marriage_after_14(marriage,husbID, wifeID,indInfo):
@@ -791,6 +838,7 @@ def main():
     divorce_before_death()
 
     birth_before_marriage_of_parents()
+    birth_before_death_of_parents()
 
 
 if __name__ == '__main__':
