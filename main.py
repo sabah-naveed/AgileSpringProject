@@ -348,14 +348,13 @@ def marriage_before_divorce():
                 #print("marr: ", marr)
         #if marriage is after divorce
         if datetime.strptime(marr, "%d %b %Y") > datetime.strptime(div, "%d %b %Y"):
-            print("ERROR: US04: Marriage before divorce")
+            print("ERROR: US04: Marriage after divorce")
         
     
 
 #US05
 def marriage_before_death():
     #Marriage should occur before death of either spouse
-    print("[NOT IMPLEMENTED] US05: Marriage before death")
     bbmList = ["h", "w", "m"]
     #print("family: \n", famInfo)
     marrBool = False
@@ -395,6 +394,41 @@ def marriage_before_death():
 def divorce_before_death():
     #Divorce can only occur before death of both spouses
     print("[NOT IMPLEMENTED] US06: Divorce before death")
+    bbmList = ["h", "w", "d"]
+    #print("family: \n", famInfo)
+    divBool = False
+    for i in range(len(famInfo)):
+        for j in famInfo[i]:
+            if divBool:
+                bbmList[2] = j[7:]
+                divBool = False
+            if "HUSB" in j:
+                husbID = j[7:]
+                bbmList[0] = husbID
+                #print("husbID: ", husbID)
+            if "WIFE" in j:
+                wifeID = j[7:]
+                bbmList[1] = wifeID
+                #print("wifeID: ", wifeID)
+            if "DIV" in j:
+                divBool = True
+    
+    coupleDeaths = ["h", "w"]
+    for i in range(len(individuals)):
+        if individuals[i][0] == bbmList[0]:
+            husbDeath = individuals[i][6]
+            coupleDeaths[0] = husbDeath
+        if individuals[i][0] == bbmList[1]:
+            wifeDeath = individuals[i][6]
+            coupleDeaths[1] = wifeDeath
+
+    print(coupleDeaths)
+    if coupleDeaths[0] != "N/A":
+        if datetime.strptime(bbmList[2], "%d %b %Y") > datetime.strptime(coupleDeaths[0], "%d %b %Y"):
+            print("ERROR: US05: Divorce after death for husband")
+    if coupleDeaths[1] != "N/A":
+        if datetime.strptime(bbmList[2], "%d %b %Y") > datetime.strptime(coupleDeaths[1], "%d %b %Y"):
+            print("ERROR: US05: Divorce after death for wife")
 
 #US07
 def less_than_150_years_old(a):
