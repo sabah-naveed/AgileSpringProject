@@ -632,6 +632,17 @@ def unique_name_and_birth_date():
 def unique_families_by_spouses():
     #No more than one family with the same spouses by name and the same marriage date should appear in a GEDCOM file
     print("[NOT IMPLEMENTED] US24: Unique families by spouses")
+    print(families)
+    familiesDict = []   #key = husband name, wife name value = marriage date
+    for f in range(len(families)):
+        if families[f][0][0] == "@":
+            print(families[f][:-1])
+            if families[f][:-1] in familiesDict:
+                print("ERROR: US24: Family with same spouses and marriage date")
+            else:
+                familiesDict.append(families[f][:-1])
+    print(familiesDict)
+                
 
 #US27
 def include_individual_ages(dob):
@@ -882,6 +893,8 @@ def main():
 
     unique_name_and_birth_date()
     siblings_should_not_marry()
+
+    unique_families_by_spouses()
 
 
 if __name__ == '__main__':
