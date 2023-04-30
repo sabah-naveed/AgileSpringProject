@@ -128,8 +128,12 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
         age = 0
         alive = True
         deathDate = "N/A"
+        deathBool = False
          #print('indInfo of i..', i, indInfo[i])
         for item in indInfo[i]:
+            if deathBool:
+                deathDate = item[7:]
+                deathBool = False
             if "FAMS" in item:
                 indexOfFamS = indInfo[i].index(next(item for item in indInfo[i] if "FAMS" in item))
                 #  print('index is...',indexOfFamS)
@@ -151,6 +155,7 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
                 #print("inside indinfo\n", indInfo[i])
                 #list_deceased(filename)
                 print("DEAT found")
+                deathBool = True
                 
 
         if indInfo[i][4][8] == " " :
@@ -166,7 +171,7 @@ def parse_file(filename, individuals, families, indInfo, spouseArray, lessThan15
 
         print(dead)
         individualTable.add_row([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, "False" if (indInfo[i][0][2:6] in dead) else "True", deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
-        individuals.append([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, alive, deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
+        individuals.append([indInfo[i][0][2:6], indInfo[i][1][7:], indInfo[i][2][6:], indInfo[i][4][7:], age, "False" if (indInfo[i][0][2:6] in dead) else "True", deathDate, childFam if child else "N/A" , spouseFam if spouse else "N/A"])
 
 
 
@@ -309,6 +314,8 @@ def birth_before_death(filename):
     f = open(filename, "r")
     contents = f.read()
     lines = contents.splitlines()
+    
+
 
 
 
@@ -316,6 +323,7 @@ def birth_before_death(filename):
 def marriage_before_divorce():
     #Marriage should occur before divorce of spouses, and divorce can only occur after marriage
     print("[NOT IMPLEMENTED] US04: Marriage before divorce")
+    
 
 #US05
 def marriage_before_death():
@@ -454,9 +462,18 @@ def list_deceased(filename):
     contents = f.read()
     lines = contents.splitlines()
     currentIndividual = ""
+    
     print("lines are:: ",lines)
+    deadBool = False
     for line in lines:
         #if '0 @Ix@ INDI' type of line reached
+        if deadBool:
+            if "DATE" in line:
+                tempDate = lines[7:]
+                tempDate = str(tempDate)
+                dead[len(dead)-1] += tempDate
+                deadBool = False
+                continue
         if "INDI" in line:
             currentIndividual = line[2:6]
             print("current individual is:: ",currentIndividual)
@@ -464,7 +481,9 @@ def list_deceased(filename):
         if "DEAT" in line:
             #print("DEAT line reached..",line)
             dead.append(currentIndividual)
+            deadBool = True
     print("dead array is:: ",dead)
+    print("------")
 
     
 
@@ -631,6 +650,8 @@ def main():
 
     birth_before_marriage()
     birth_before_death("gedexample.txt")
+
+    marriage_before_divorce()
 
 
 if __name__ == '__main__':
