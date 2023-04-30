@@ -572,21 +572,6 @@ def marriage_after_14(marriage,husbID, wifeID,indInfo):
             print("ERROR: US10 - Wife DOB < 14 at the time of marriage")
 
 
-#US12
-def parents_not_too_old():
-    #Mother should be less than 60 years older than her children and father should be less than 80 years older than his children
-    print("[NOT IMPLEMENTED] US12: Parents not too old")
-
-#US13
-def siblings_spacing():
-    #Birth dates of siblings should be more than 8 months apart or less than 2 days apart (twins may be born one day apart, e.g. 11:59 PM and 12:02 AM the following calendar day)
-    print("[NOT IMPLEMENTED] US13: Siblings spacing")
-
-#US17
-def no_marriages_to_descendants():
-    #Parents should not marry any of their descendants
-    print("[NOT IMPLEMENTED] US17: No marriages to descendants")
-
 #US18
 def siblings_should_not_marry():
     #Siblings should not marry one another
@@ -597,21 +582,6 @@ def siblings_should_not_marry():
                 print("ERROR: US18: Siblings should not marry")
                 
 
-
-#US19
-def first_cousins_should_not_marry():
-    #First cousins should not marry one another
-    print("[NOT IMPLEMENTED] US19: First cousins should not marry")
-
-#US20
-def aunts_and_uncles():
-    #Aunts and uncles should not marry their nieces or nephews, their siblings’ children
-    print("[NOT IMPLEMENTED] US20: Aunts and uncles")
-
-#US22
-def unique_ids():
-    #All individual IDs should be unique and all family IDs should be unique
-    print("[NOT IMPLEMENTED] US22: Unique IDs")
 
 #US23
 def unique_name_and_birth_date():
@@ -631,17 +601,16 @@ def unique_name_and_birth_date():
 #US24
 def unique_families_by_spouses():
     #No more than one family with the same spouses by name and the same marriage date should appear in a GEDCOM file
-    print("[NOT IMPLEMENTED] US24: Unique families by spouses")
-    print(families)
+    #print(families)
     familiesDict = []   #key = husband name, wife name value = marriage date
     for f in range(len(families)):
         if families[f][0][0] == "@":
-            print(families[f][:-1])
+            #print(families[f][:-1])
             if families[f][:-1] in familiesDict:
                 print("ERROR: US24: Family with same spouses and marriage date")
             else:
                 familiesDict.append(families[f][:-1])
-    print(familiesDict)
+    #print(familiesDict)
                 
 
 #US27
@@ -726,15 +695,6 @@ def list_living_single():
                 singles.append(individuals[i][1])
     print("living single over 30: ", singles)
 
-#US32
-def list_multiple_births():
-    #List all multiple births in a GEDCOM file
-    print("[NOT IMPLEMENTED] US32: List multiple births")
-
-#US33
-def list_orphans():
-    #List all orphaned children (both parents dead and child < 18 years old) in a GEDCOM file
-    print("[NOT IMPLEMENTED] US33: List orphans")
 
 #US34
 def list_large_age_differences(hID, wID):
