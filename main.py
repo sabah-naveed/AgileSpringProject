@@ -309,11 +309,21 @@ def birth_before_marriage():
 #US03
 def birth_before_death(filename):
     #Birth should occur before death of an individual
-    
-    print("individual: \n", individuals)
-    f = open(filename, "r")
-    contents = f.read()
-    lines = contents.splitlines()
+    #print("running birth before death")
+    #print("individual: \n", individuals)
+
+    for i in range(len(individuals)):
+        if len(individuals[i]) > 3:
+            bday = individuals[i][3]
+            if individuals[i][5] == 'True':
+                continue
+            else:
+                dday = individuals[i][6]
+
+            dateFormat = "%d %b %Y"
+            #if bday is after dday
+            if datetime.strptime(bday, dateFormat) > datetime.strptime(dday, dateFormat):
+                print("ERROR: US03: Birth before death for individual", individuals[i][0])
     
 
 
@@ -471,7 +481,6 @@ def list_deceased(filename):
             if "DATE" in line:
                 tempDate = lines[7:]
                 tempDate = str(tempDate)
-                dead[len(dead)-1] += tempDate
                 deadBool = False
                 continue
         if "INDI" in line:
